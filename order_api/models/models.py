@@ -43,7 +43,7 @@ class POSOrder(models.Model):
             response = requests.request("POST", url, headers=headers, data=payload)
 
             fatoraLink=response.json()
-            print(fatoraLink["IsSuccess"])
+            self.note=fatoraLink
             if fatoraLink["IsSuccess"]!=False:
                 self.myfatoorah_link=fatoraLink["Data"]["InvoiceURL"]
                 self.myfatoorah_invoice_id=fatoraLink["Data"]["InvoiceId"]
