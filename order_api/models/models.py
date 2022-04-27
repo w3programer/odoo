@@ -114,10 +114,10 @@ class POSOrder(models.Model):
             raise e
 
 
-class twilio_sms_config(models.Model):
-    _name = 'twillio.config'
+# class twilio_sms_config(models.Model):
+#     _name = 'twillio.config'
 
-    name = fields.Char('Name')
-    account_sid = fields.Char('Account SID')
-    auth_token = fields.Char('Auth Token')
-    number_from = fields.Char('Number From')
+#     name = fields.Char('Name')
+#     account_sid = fields.Char('Account SID')
+#     auth_token = fields.Char('Auth Token')
+#     number_from = fields.Char('Number From')
