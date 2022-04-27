@@ -2,7 +2,7 @@
 import json
 from odoo import models, fields, api
 import requests
-# from twilio.rest import Client
+from twilio.rest import Client
 from odoo.exceptions import ValidationError, AccessError
 class POSOrder(models.Model):
     _inherit = 'pos.order'
@@ -18,7 +18,6 @@ class POSOrder(models.Model):
     def create(self, vals_list):
         res = super(POSOrder, self).create(vals_list)
         res.create_fatoorah_link()
-        res.action_send_sms()
         return res
 
     def create_fatoorah_link(self):
@@ -43,10 +42,11 @@ class POSOrder(models.Model):
             response = requests.request("POST", url, headers=headers, data=payload)
 
             fatoraLink=response.json()
-            print(fatoraLink["IsSuccess"])
+            self.note = fatoraLink
             if fatoraLink["IsSuccess"]!=False:
                 self.myfatoorah_link=fatoraLink["Data"]["InvoiceURL"]
                 self.myfatoorah_invoice_id=fatoraLink["Data"]["InvoiceId"]
+                self.action_send_sms()
         except AccessError as e:
             raise e
 
@@ -65,6 +65,7 @@ class POSOrder(models.Model):
             }
             response = requests.request("POST", url, headers=headers, data=payload)
             myfatoorstatus = response.json()
+
             print(myfatoorstatus["IsSuccess"])
 
             if myfatoorstatus["IsSuccess"] != False:
@@ -111,3 +112,12 @@ class POSOrder(models.Model):
 
         except AccessError as e:
             raise e
+
+
+class twilio_sms_config(models.Model):
+    _name = 'twillio.config'
+
+    name = fields.Char('Name')
+    account_sid = fields.Char('Account SID')
+    auth_token = fields.Char('Auth Token')
+    number_from = fields.Char('Number From')
