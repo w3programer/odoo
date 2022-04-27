@@ -1,6 +1,6 @@
 <odoo>
     <data>
-    <record id="twillio_config_view_form" model="ir.ui.view">
+<!--     <record id="twillio_config_view_form" model="ir.ui.view">
         <field name="name">twillio.config.form</field>
         <field name="model">twillio.config</field>
         <field name="arch" type="xml">
@@ -49,6 +49,6 @@
     <menuitem id="root_twillio_config" name="Twilio Configurations" />
 
     <menuitem id="sub_menu_twillio_config_menu" parent="root_twillio_config" name="Settings"/>
-    <menuitem action="twillio_config_action" id="twillio_config_menu" parent="sub_menu_twillio_config_menu" name="Settings"/>
+    <menuitem action="twillio_config_action" id="twillio_config_menu" parent="sub_menu_twillio_config_menu" name="Settings"/> -->
     </data>
 </odoo>
