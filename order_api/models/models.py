@@ -2,7 +2,7 @@
 import json
 from odoo import models, fields, api
 import requests
-# from twilio.rest import Client
+from twilio.rest import Client
 from odoo.exceptions import ValidationError, AccessError
 class POSOrder(models.Model):
     _inherit = 'pos.order'
@@ -76,27 +76,27 @@ class POSOrder(models.Model):
     def action_send_sms(self):
         try:
             if self.myfatoorah_link:
-#                 if self.partner_id.mobile:
-#                     to=self.partner_id.mobile
-#                     mob_number =f"+92{to[1:]}"
-#                     print(mob_number)
-#                     twillo_data = self.env['twillio.config'].search([])
-#                     if twillo_data:
-#                         data = twillo_data[-1]
-#                         account_sid = data.account_sid
-#                         auth_token = data.auth_token
-#                         number = data.number_from
-#                         client = Client(account_sid, auth_token)
-#                         msg = "Invoice link for payment "  "\n"  " يرجى استخدام رابط الفاتورة للدفع" "\n" + str(self.myfatoorah_link)
-#                         message = client.messages.create(body=  msg , from_=number, to=mob_number )
-#                         if message.sid:
-#                             move_dict = {
-#                                 'partner_id': self.partner_id.id,
-#                                 'number': mob_number,
-#                                 'body':   msg ,
-#                                 'state': 'sent',
-#                             }
-#                             self.env['sms.sms'].create(move_dict)
+                 if self.partner_id.mobile:
+                     to=self.partner_id.mobile
+                     mob_number =f"+92{to[1:]}"
+                     print(mob_number)
+                     twillo_data = self.env['twillio.config'].search([])
+                     if twillo_data:
+                         data = twillo_data[-1]
+                         account_sid = data.account_sid
+                         auth_token = data.auth_token
+                         number = data.number_from
+                         client = Client(account_sid, auth_token)
+                         msg = "Invoice link for payment "  "\n"  " يرجى استخدام رابط الفاتورة للدفع" "\n" + str(self.myfatoorah_link)
+                         message = client.messages.create(body=  msg , from_=number, to=mob_number )
+                         if message.sid:
+                             move_dict = {
+                                 'partner_id': self.partner_id.id,
+                                 'number': mob_number,
+                                 'body':   msg ,
+                                 'state': 'sent',
+                             }
+                             self.env['sms.sms'].create(move_dict)
                 if self.partner_id.email:
                     msg = "Invoice link for payment "  "\n"  " يرجى استخدام رابط الفاتورة للدفع" "\n" + str(
                         self.myfatoorah_link)
