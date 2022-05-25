@@ -21,7 +21,7 @@
 
     # any module necessary for this one to work correctly
     'depends': ['base', 'sale','stock','point_of_sale','hr_expense'],
-    "external_dependencies": {"python": ["twilio"]},
+#     "external_dependencies": {"python": ["twilio"]},
 
     # always loaded
     'data': [
