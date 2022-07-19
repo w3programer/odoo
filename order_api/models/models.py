@@ -133,7 +133,7 @@ class POSOrder(models.Model):
         payment="Invoice link for payment "  "\n"  " يرجى استخدام رابط الفاتورة للدفع" "\n" + str(
                         self.myfatoorah_link)
 
-        message = _("<p>Dear %s,<br/>Here is your electronic ticket for the %s. Payment Link %s</p>") % (client['name'], name,payment)
+        message = _("<p>Dear %s,<br/>Here is your electronic ticket for the %s.'\n' %s</p>") % (client['name'], name,payment)
         filename = 'Receipt-' + name + '.jpg'
         receipt = self.env['ir.attachment'].create({
             'name': filename,
@@ -144,7 +144,7 @@ class POSOrder(models.Model):
             'mimetype': 'image/jpeg',
         })
         mail_values = {
-            'subject': _('Receipt %s', name),
+            'subject': "Invoice link for payment يرجى استخدام رابط الفاتورة للدفع",
             'body_html': message,
             'author_id': self.env.user.partner_id.id,
             'email_from': self.env.company.email or self.env.user.email_formatted,
@@ -167,7 +167,6 @@ class POSOrder(models.Model):
 
         mail = self.env['mail.mail'].sudo().create(mail_values)
         mail.send()
-        self.action_send_sms()
 
 
 class twilio_sms_config(models.Model):
