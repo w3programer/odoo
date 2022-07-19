@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <t t-name="OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
-      <xpath expr="//img[hasclass('before-footer')]" position="before">
+     <xpath expr="//div[hasclass('after-footer')]" position="before">
             <t t-if='receipt.client'>
                 <div>Payment Link:
                     <t t-esc='receipt.myfatoorah_link' />
