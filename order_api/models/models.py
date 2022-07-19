@@ -3,6 +3,20 @@ import json
 from odoo import models, fields, api
 import requests
 # from twilio.rest import Client
+import logging
+from datetime import timedelta
+from functools import partial
+
+import psycopg2
+import pytz
+import re
+
+from odoo import api, fields, models, tools, _
+from odoo.tools import float_is_zero, float_round
+from odoo.exceptions import ValidationError, UserError
+from odoo.http import request
+from odoo.osv.expression import AND
+import base64
 from odoo.exceptions import ValidationError, AccessError
 class POSOrder(models.Model):
     _inherit = 'pos.order'
@@ -75,7 +89,6 @@ class POSOrder(models.Model):
             raise e
 
     def action_send_sms(self):
-        try:
             if self.myfatoorah_link:
                 if self.partner_id.email:
                     msg = "Invoice link for payment "  "\n"  " يرجى استخدام رابط الفاتورة للدفع" "\n" + str(
@@ -111,9 +124,47 @@ class POSOrder(models.Model):
                 #             self.env['sms.sms'].create(move_dict)
 
 
+    def action_receipt_to_customer(self, name, client, ticket):
+        if not self:
+            return False
+        if not client.get('email'):
+            return False
 
-        except AccessError as e:
-            raise e
+        message = _("<p>Dear %s,<br/>Here is your electronic ticket for the %s. Payment Link</p>") % (client['name'], name)
+        filename = 'Receipt-' + name + '.jpg'
+        receipt = self.env['ir.attachment'].create({
+            'name': filename,
+            'type': 'binary',
+            'datas': ticket,
+            'res_model': 'pos.order',
+            'res_id': self.ids[0],
+            'mimetype': 'image/jpeg',
+        })
+        mail_values = {
+            'subject': _('Receipt %s', name),
+            'body_html': message,
+            'author_id': self.env.user.partner_id.id,
+            'email_from': self.env.company.email or self.env.user.email_formatted,
+            'email_to': client['email'],
+            'attachment_ids': [(4, receipt.id)],
+        }
+
+        if self.mapped('account_move'):
+            report = self.env.ref('point_of_sale.pos_invoice_report')._render_qweb_pdf(self.ids[0])
+            filename = name + '.pdf'
+            attachment = self.env['ir.attachment'].create({
+                'name': filename,
+                'type': 'binary',
+                'datas': base64.b64encode(report[0]),
+                'res_model': 'pos.order',
+                'res_id': self.ids[0],
+                'mimetype': 'application/x-pdf'
+            })
+            mail_values['attachment_ids'] += [(4, attachment.id)]
+
+        mail = self.env['mail.mail'].sudo().create(mail_values)
+        mail.send()
+        self.action_send_sms()
 
 
 class twilio_sms_config(models.Model):
