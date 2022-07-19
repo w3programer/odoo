@@ -11,7 +11,7 @@
 
     'author': "Hunain AK",
     'website': "http://www.haksolutions.com",
-#     "external_dependencies": {"python": ["twilio"]},
+    # "external_dependencies": {"python": ["twilio"]},
     'images': ['static/description/icon.png'],
 
     # Categories can be used to filter modules in modules listing
@@ -34,9 +34,5 @@
     'demo': [
         'demo/demo.xml',
     ],
-    'assets': {
-        'web.assets_qweb': [
-            "order_api/static/src/xml/pos.xml",
-        ],
-    },
+    
 }
