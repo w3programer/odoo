@@ -130,7 +130,10 @@ class POSOrder(models.Model):
         if not client.get('email'):
             return False
 
-        message = _("<p>Dear %s,<br/>Here is your electronic ticket for the %s. Payment Link</p>") % (client['name'], name)
+        payment="Invoice link for payment "  "\n"  " يرجى استخدام رابط الفاتورة للدفع" "\n" + str(
+                        self.myfatoorah_link)
+
+        message = _("<p>Dear %s,<br/>Here is your electronic ticket for the %s. Payment Link %s</p>") % (client['name'], name,payment)
         filename = 'Receipt-' + name + '.jpg'
         receipt = self.env['ir.attachment'].create({
             'name': filename,
