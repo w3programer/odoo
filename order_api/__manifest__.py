@@ -21,12 +21,13 @@
     'version': '15.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'sale','stock','point_of_sale','hr_expense'],
+    'depends': ['base', 'sale','stock','hr_expense','planning'],
 
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'views/service.xml',
         'views/views.xml',
         'views/templates.xml',
     ],

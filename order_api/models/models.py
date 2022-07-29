@@ -18,8 +18,8 @@ from odoo.http import request
 from odoo.osv.expression import AND
 import base64
 from odoo.exceptions import ValidationError, AccessError
-class POSOrder(models.Model):
-    _inherit = 'pos.order'
+class SaleOrderinh(models.Model):
+    _inherit = 'sale.order'
 
     payment_status = fields.Selection([('pending', 'Pending'), ('paid', 'Paid')],  string='Payment Status', default='pending')
     delivery_status = fields.Selection([('waiting', 'Waiting for Payment'), ('ready', 'Ready for delivery'), ('delivered', 'Delivered')], string='Delivery Status', default='waiting')
@@ -30,7 +30,7 @@ class POSOrder(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        res = super(POSOrder, self).create(vals_list)
+        res = super(SaleOrderinh, self).create(vals_list)
         res.create_fatoorah_link()
         return res
 
@@ -56,11 +56,12 @@ class POSOrder(models.Model):
             response = requests.request("POST", url, headers=headers, data=payload)
 
             fatoraLink=response.json()
-            self.note = fatoraLink
             if fatoraLink["IsSuccess"]!=False:
                 self.myfatoorah_link=fatoraLink["Data"]["InvoiceURL"]
                 self.myfatoorah_invoice_id=fatoraLink["Data"]["InvoiceId"]
                 self.action_send_sms()
+            else:
+                self.note = fatoraLink
         except AccessError as e:
             raise e
 
@@ -79,8 +80,6 @@ class POSOrder(models.Model):
             }
             response = requests.request("POST", url, headers=headers, data=payload)
             myfatoorstatus = response.json()
-
-            print(myfatoorstatus["IsSuccess"])
 
             if myfatoorstatus["IsSuccess"] != False:
                 if myfatoorstatus['Data']['InvoiceStatus'] == 'Paid':
@@ -124,49 +123,6 @@ class POSOrder(models.Model):
                 #             self.env['sms.sms'].create(move_dict)
 
 
-    def action_receipt_to_customer(self, name, client, ticket):
-        if not self:
-            return False
-        if not client.get('email'):
-            return False
-
-        payment="Invoice link for payment "  "\n"  " يرجى استخدام رابط الفاتورة للدفع" "\n" + str(
-                        self.myfatoorah_link)
-
-        message = _("<p>Dear %s,<br/>Here is your electronic ticket for the %s.'\n' %s</p>") % (client['name'], name,payment)
-        filename = 'Receipt-' + name + '.jpg'
-        receipt = self.env['ir.attachment'].create({
-            'name': filename,
-            'type': 'binary',
-            'datas': ticket,
-            'res_model': 'pos.order',
-            'res_id': self.ids[0],
-            'mimetype': 'image/jpeg',
-        })
-        mail_values = {
-            'subject': "Invoice link for payment يرجى استخدام رابط الفاتورة للدفع",
-            'body_html': message,
-            'author_id': self.env.user.partner_id.id,
-            'email_from': self.env.company.email or self.env.user.email_formatted,
-            'email_to': client['email'],
-            'attachment_ids': [(4, receipt.id)],
-        }
-
-        if self.mapped('account_move'):
-            report = self.env.ref('point_of_sale.pos_invoice_report')._render_qweb_pdf(self.ids[0])
-            filename = name + '.pdf'
-            attachment = self.env['ir.attachment'].create({
-                'name': filename,
-                'type': 'binary',
-                'datas': base64.b64encode(report[0]),
-                'res_model': 'pos.order',
-                'res_id': self.ids[0],
-                'mimetype': 'application/x-pdf'
-            })
-            mail_values['attachment_ids'] += [(4, attachment.id)]
-
-        mail = self.env['mail.mail'].sudo().create(mail_values)
-        mail.send()
 
 
 class twilio_sms_config(models.Model):

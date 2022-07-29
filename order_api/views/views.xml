@@ -1,16 +1,16 @@
 <odoo>
   <data>
-       <record model="ir.ui.view" id="pos_order_form_view">
-            <field name="name">POS order form view</field>
-            <field name="model">pos.order</field>
-            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+       <record model="ir.ui.view" id="sale_order_form_view">
+            <field name="name">Sale order form view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                 <xpath expr="//button[@name='action_pos_order_invoice']" position="after">
+                 <xpath expr="//button[@name='action_cancel']" position="before">
                    <button name="create_fatoorah_link" string="Create MyFatoorah Link" type="object"/>
                    <button name="update_fatoorah_status" string="Check Payment Status" type="object"/>
                    <button name="action_send_sms" string="Send SMS" type="object"/>
                  </xpath>
-                <xpath expr="//field[@name='fiscal_position_id']" position="after">
+                <xpath expr="//field[@name='payment_term_id']" position="after">
                     <field name="myfatoorah_invoice_id" readonly="1"/>
                     <field name="myfatoorah_link" readonly="1"/>
                     <field name="myfatoorah_bol" readonly="1"/>
